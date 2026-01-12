@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Project {{ level.id }}: {{ level.title }} - Python Projects{% endblock %}
+
+{% block content %}
+<main class="main-container">
+    <div class="level-nav">
+        <a href="/" class="nav-back">← All Projects</a>
+        <span class="level-badge">Project {{ level.id }} of {{ total_levels }}</span>
+        {% if level.id in completed %}
+        <a href="/reset/{{ level.id }}" class="reset-link" onclick="return confirm('Reset progress for this project?')">🔄 Reset Project</a>
+        {% endif %}
+    </div>
+
+    <div>
+        <h1 class="level-page-title">{{ level.title }}</h1>
+        <div class="level-page-difficulty">{{ level.difficulty }} Project</div>
+    </div>
+
+    <div id="successBanner" class="success-banner">
+        <div class="success-icon">🎉</div>
+        <div class="success-text">
+            <h3>Project Complete!</h3>
+            <p id="successMessage">Your code produced the correct output!</p>
+        </div>
+        <div class="success-actions">
+            {% if level.id < total_levels %}
+            <a href="/level/{{ level.id + 1 }}" class="btn btn-white" id="nextLevelBtn">Next Project →</a>
+            {% else %}
+            <a href="/" class="btn btn-white">View All Projects</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="level-layout">
+        <div class="info-panel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">📖</div>
+                    <h3 class="card-title">Project Description</h3>
+                </div>
+                <div class="card-content">
+                    {{ level.description | safe }}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon pink">🎯</div>
+                    <h3 class="card-title">Your Task</h3>
+                </div>
+                <div class="card-content task-text">
+                    {{ level.task | safe }}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">📚</div>
+                    <h3 class="card-title">Learning Goals</h3>
+                </div>
+                <div class="card-content">
+                    <div class="level-goals">
+                        {% for goal in level.learning_goals %}
+                        <span class="goal-tag">{{ goal }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="hint-container">
+                <button class="hint-toggle" onclick="toggleHint()">
+                    <div class="hint-toggle-header">
+                        <span>💡</span>
+                        <span>Need a hint?</span>
+                        <span id="hintArrow">▼</span>
+                    </div>
+                    <div class="hint-content" id="hintContent">{{ level.hint }}</div>
+                </button>
+            </div>
+        </div>
+
+        <div class="editor-panel">
+            <form method="POST" action="/submit" id="codeForm">
+                <input type="hidden" name="level_id" value="{{ level.id }}">
+                <div class="code-editor-container">
+                    <div class="editor-header">
+                        <div class="editor-dots">
+                            <div class="editor-dot red"></div>
+                            <div class="editor-dot yellow"></div>
+                            <div class="editor-dot green"></div>
+                        </div>
+                        <div class="editor-title">{{ level.title | lower | replace(' ', '_') }}.py</div>
+                    </div>
+                    <textarea
+                        name="code"
+                        id="codeEditor"
+                        class="code-textarea"
+                        placeholder="# Write your Python code here...&#10;# Build your {{ level.title }} project!&#10;&#10;"
+                        spellcheck="false"
+                        autocomplete="off"
+                        autocapitalize="off"
+                    ></textarea>
+                    <div class="editor-actions">
+                        <button type="button" class="btn btn-secondary" onclick="clearEditor()">Clear</button>
+                        <button type="submit" class="btn btn-primary">
+                            ▶ Run Code
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="output-panel" id="outputPanel">
+                <div class="output-header" id="outputHeader">
+                    <span id="outputIcon">📤</span>
+                    <span class="output-title" id="outputTitle">Output</span>
+                </div>
+                <div class="output-content" id="outputContent">
+                    <!-- Output will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    function toggleHint() {
+        const content = document.getElementById('hintContent');
+        const arrow = document.getElementById('hintArrow');
+        content.classList.toggle('show');
+        arrow.textContent = content.classList.contains('show') ? '▲' : '▼';
+    }
+
+    function clearEditor() {
+        document.getElementById('codeEditor').value = '';
+        document.getElementById('outputPanel').classList.remove('show');
+        document.getElementById('successBanner').classList.remove('show');
+    }
+
+    // Handle tab key in textarea
+    document.getElementById('codeEditor').addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 4;
+        }
+    });
+
+    // Handle form submission with AJAX
+    document.getElementById('codeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const outputPanel = document.getElementById('outputPanel');
+        const outputHeader = document.getElementById('outputHeader');
+        const outputContent = document.getElementById('outputContent');
+        const outputIcon = document.getElementById('outputIcon');
+        const outputTitle = document.getElementById('outputTitle');
+        const successBanner = document.getElementById('successBanner');
+
+        // Show loading state
+        outputPanel.classList.add('show');
+        outputHeader.className = 'output-header';
+        outputIcon.textContent = '⏳';
+        outputTitle.textContent = 'Running...';
+        outputContent.innerHTML = 'Executing your code...';
+        successBanner.classList.remove('show');
+
+        fetch('/submit', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Success!
+                outputHeader.className = 'output-header success';
+                outputIcon.textContent = '🎉';
+                outputTitle.textContent = 'Project Complete!';
+
+                let html = '<div class="output-section">';
+                html += '<div class="output-label">Your Output</div>';
+                html += '<div class="output-value success">' + escapeHtml(data.output) + '</div>';
+                html += '</div>';
+
+                html += '<div class="output-section">';
+                html += '<div class="output-label">Stats</div>';
+                html += '<div class="output-value">⭐ Score: ' + data.score + ' | 🔥 Day Streak: ' + data.streak + '</div>';
+                html += '</div>';
+
+                outputContent.innerHTML = html;
+
+                // Show success banner
+                successBanner.classList.add('show');
+                document.getElementById('successMessage').textContent =
+                    'Great work! Your code works perfectly. Score: ' + data.score + ' ⭐';
+
+                // Update header stats
+                updateHeaderStats(data.streak, data.score, data.completed_count, data.total_levels);
+
+            } else {
+                // Error or wrong answer
+                outputHeader.className = 'output-header error';
+                outputIcon.textContent = '❌';
+                outputTitle.textContent = data.error ? 'Error' : 'Not Quite Right';
+
+                let html = '';
+
+                if (data.error) {
+                    html += '<div class="output-section">';
+                    html += '<div class="output-label">Error</div>';
+                    html += '<div class="output-value error">' + escapeHtml(data.error) + '</div>';
+                    html += '</div>';
+                }
+
+                if (data.output) {
+                    html += '<div class="output-section">';
+                    html += '<div class="output-label">Your Output</div>';
+                    html += '<div class="output-value">' + escapeHtml(data.output) + '</div>';
+                    html += '</div>';
+                }
+
+                html += '<div class="output-section">';
+                html += '<div class="output-label">Expected Output</div>';
+                html += '<div class="output-value success">' + escapeHtml(data.expected) + '</div>';
+                html += '</div>';
+
+                html += '<div class="solution-box">';
+                html += '<div class="output-label">💡 Solution</div>';
+                html += '<div class="output-value">' + escapeHtml(data.solution) + '</div>';
+                html += '</div>';
+
+                html += '<div class="explanation-box">';
+                html += '<strong>📚 Explanation:</strong><br>' + data.explanation;
+                html += '</div>';
+
+                outputContent.innerHTML = html;
+
+                // Update stats display (without updating completed count on error)
+                updateHeaderStats(data.streak, data.score, null, null);
+            }
+        })
+        .catch(error => {
+            outputHeader.className = 'output-header error';
+            outputIcon.textContent = '⚠️';
+            outputTitle.textContent = 'Error';
+            outputContent.innerHTML = '<div class="output-value error">An error occurred. Please try again.</div>';
+        });
+    });
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML.replace(/\n/g, '<br>');
+    }
+
+    function updateHeaderStats(streak, score, completed, total) {
+        // Update streak badge
+        const streakValue = document.querySelector('.streak-badge .stat-value');
+        if (streakValue) {
+            streakValue.textContent = streak;
+        }
+
+        // Update score badge
+        const statBadges = document.querySelectorAll('.stat-badge');
+        if (statBadges.length >= 2 && score !== null) {
+            const scoreValue = statBadges[1].querySelector('.stat-value');
+            if (scoreValue) {
+                scoreValue.textContent = score;
+            }
+        }
+
+        // Update completed count if provided
+        if (completed !== null && total !== null) {
+            const statBadgesAll = document.querySelectorAll('.stat-badge');
+            if (statBadgesAll.length >= 3) {
+                const completedValue = statBadgesAll[2].querySelector('.stat-value');
+                if (completedValue) {
+                    completedValue.textContent = completed + '/' + total;
+                }
+            }
+
+            // Update progress bar
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = ((completed / total) * 100) + '%';
+            }
+        }
+    }
+</script>
+{% endblock %}

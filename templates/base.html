@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Python Projects - Learn by Building{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #0f172a;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-dark: #1e293b;
+            --bg-darker: #0f172a;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --text-white: #f8fafc;
+            --border: #e2e8f0;
+            --border-dark: #334155;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: #fbbf24;
+        }
+
+        .header-stats {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.15);
+            border-radius: var(--radius-md);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-icon {
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-white);
+            font-size: 1rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .streak-badge {
+            background: linear-gradient(135deg, var(--warning) 0%, #f97316 100%);
+        }
+
+        .streak-badge .stat-value {
+            color: white;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            background: rgba(255,255,255,0.2);
+            height: 6px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24 0%, #fde047 100%);
+            transition: width 0.5s ease;
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Level Grid */
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .level-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-light);
+        }
+
+        .level-card.completed {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--bg-secondary) 100%);
+        }
+
+        .level-card.locked {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .level-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .level-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .level-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .level-difficulty {
+            padding: 0.25rem 0.625rem;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--primary);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .level-card.completed .level-number {
+            background: var(--success);
+        }
+
+        .level-card.completed .level-number::after {
+            content: '✓';
+        }
+
+        .level-card.completed .level-number span {
+            display: none;
+        }
+
+        .level-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .level-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .level-goals {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .goal-tag {
+            padding: 0.25rem 0.625rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .level-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .level-link:hover {
+            background: var(--primary-dark);
+            transform: translateX(4px);
+        }
+
+        .level-card.completed .level-link {
+            background: var(--success);
+        }
+
+        /* Level Page Styles */
+        .level-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .level-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .card-icon.purple { background: rgba(139, 92, 246, 0.1); }
+        .card-icon.green { background: rgba(16, 185, 129, 0.1); }
+        .card-icon.yellow { background: rgba(245, 158, 11, 0.1); }
+        .card-icon.pink { background: rgba(236, 72, 153, 0.1); }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-content {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+        }
+
+        .card-content code {
+            background: var(--bg-dark);
+            color: var(--accent);
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875em;
+        }
+
+        .task-text {
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .task-text strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Code Editor */
+        .editor-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .code-editor-container {
+            background: var(--bg-darker);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .editor-header {
+            background: var(--bg-dark);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .editor-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editor-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .editor-dot.red { background: #ff5f57; }
+        .editor-dot.yellow { background: #febc2e; }
+        .editor-dot.green { background: #28c840; }
+
+        .editor-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8125rem;
+            color: var(--text-light);
+        }
+
+        .code-textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 1.25rem;
+            background: var(--bg-darker);
+            color: #e2e8f0;
+            border: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            resize: vertical;
+            outline: none;
+        }
+
+        .code-textarea::placeholder {
+            color: var(--text-light);
+            opacity: 0.5;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border-dark);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9375rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        /* Hint Toggle */
+        .hint-container {
+            margin-top: 1rem;
+        }
+
+        .hint-toggle {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .hint-toggle:hover {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .hint-toggle-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--warning);
+        }
+
+        .hint-content {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        .hint-content.show {
+            display: block;
+        }
+
+        /* Output Panel */
+        .output-panel {
+            background: var(--bg-darker);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: none;
+        }
+
+        .output-panel.show {
+            display: block;
+        }
+
+        .output-header {
+            padding: 0.75rem 1rem;
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .output-header.success {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .output-header.error {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .output-title {
+            font-weight: 600;
+            color: var(--text-white);
+            font-size: 0.875rem;
+        }
+
+        .output-content {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+        }
+
+        .output-section {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .output-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .output-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .output-value {
+            color: #e2e8f0;
+        }
+
+        .output-value.success {
+            color: var(--success);
+        }
+
+        .output-value.error {
+            color: var(--error);
+        }
+
+        .solution-box {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .solution-box .output-label {
+            color: var(--primary);
+        }
+
+        .explanation-box {
+            background: rgba(236, 72, 153, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Success Modal */
+        .success-banner {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .success-banner.show {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 2.5rem;
+        }
+
+        .success-text h3 {
+            color: white;
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .success-text p {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9375rem;
+        }
+
+        .success-actions {
+            margin-left: auto;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--success);
+        }
+
+        .btn-white:hover {
+            background: #f0fdf4;
+        }
+
+        /* Level Navigation */
+        .level-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9375rem;
+            transition: color 0.2s;
+        }
+
+        .nav-back:hover {
+            color: var(--primary);
+        }
+
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.875rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .level-page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .level-page-difficulty {
+            font-size: 1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .header-stats {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .levels-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .level-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .success-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .success-actions {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+        }
+
+        /* Level selector dropdown */
+        .level-selector {
+            position: relative;
+        }
+
+        .level-selector-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-white);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .level-selector-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .level-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-xl);
+            min-width: 280px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .level-dropdown.show {
+            display: block;
+        }
+
+        .level-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .level-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .level-dropdown-item:hover {
+            background: var(--bg-primary);
+        }
+
+        .level-dropdown-item.completed {
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .level-dropdown-item.locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .level-dropdown-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .level-dropdown-item.completed .level-dropdown-num {
+            background: var(--success);
+        }
+
+        .level-dropdown-info {
+            flex: 1;
+        }
+
+        .level-dropdown-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .level-dropdown-difficulty {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .reset-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            text-decoration: none;
+            margin-left: auto;
+        }
+
+        .reset-link:hover {
+            color: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">💻</div>
+                <div class="logo-text">Python<span>Projects</span></div>
+            </a>
+            <div class="header-stats">
+                <div class="stat-badge streak-badge">
+                    <span class="stat-icon">🔥</span>
+                    <div>
+                        <div class="stat-value">{{ streak }}</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-icon">⭐</span>
+                    <div>
+                        <div class="stat-value">{{ score }}</div>
+                        <div class="stat-label">Score</div>
+                    </div>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-icon">🏆</span>
+                    <div>
+                        <div class="stat-value">{{ completed|length }}/{{ levels|length }}</div>
+                        <div class="stat-label">Projects</div>
+                    </div>
+                </div>
+                <div class="level-selector">
+                    <button class="level-selector-btn" onclick="toggleLevelDropdown()">
+                        📂 Projects <span>▼</span>
+                    </button>
+                    <div class="level-dropdown" id="levelDropdown">
+                        {% for lvl in levels %}
+                        <a href="/level/{{ lvl.id }}"
+                           class="level-dropdown-item {% if lvl.id in completed %}completed{% endif %} {% if lvl.id > 1 and (lvl.id - 1) not in completed %}locked{% endif %}">
+                            <div class="level-dropdown-num">
+                                {% if lvl.id in completed %}✓{% else %}{{ lvl.id }}{% endif %}
+                            </div>
+                            <div class="level-dropdown-info">
+                                <div class="level-dropdown-title">{{ lvl.title }}</div>
+                                <div class="level-dropdown-difficulty">{{ lvl.difficulty }}</div>
+                            </div>
+                            {% if lvl.id > 1 and (lvl.id - 1) not in completed %}
+                            <span>🔒</span>
+                            {% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: {{ (completed|length / levels|length * 100)|round(1) }}%"></div>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <script>
+        function toggleLevelDropdown() {
+            document.getElementById('levelDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.level-selector')) {
+                document.getElementById('levelDropdown').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
